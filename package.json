@@ -1,0 +1,19 @@
+{
+  "name": "xray-vision",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "astronomy-engine": "2.1.19",
+    "leaflet": "1.9.4",
+    "satellite.js": "7.1.0",
+    "three": "0.187.0"
+  },
+  "license": "MIT",
+  "description": "See the city, planes, satellites and stars around you through your walls: a WebXR (Quest 3) and desktop demo built on public live data."
+}

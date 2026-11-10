@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>X-Ray Vision</title>
+    <link rel="stylesheet" href="/node_modules/leaflet/dist/leaflet.css" />
+    <style>
+      html, body { margin: 0; height: 100%; background: #000; overflow: hidden; font-family: ui-monospace, Menlo, Consolas, monospace; }
+      canvas { display: block; }
+      #hud { position: fixed; top: 12px; left: 12px; width: 300px; padding: 12px 14px; background: rgba(0, 12, 20, 0.78);
+             color: #bfefff; border: 1px solid #1d5a6e; border-radius: 8px; font-size: 12px; line-height: 1.5; }
+      #hud h1 { margin: 0 0 8px; font-size: 14px; letter-spacing: 0.2em; color: #33e0ff; }
+      #hud select, #hud input, #hud button { font: inherit; background: #04202c; color: #dff; border: 1px solid #1d5a6e; border-radius: 4px; padding: 3px 6px; }
+      #hud select { width: 100%; }
+      #hud .row { display: flex; gap: 6px; margin-top: 6px; align-items: center; }
+      #hud .row input[type=number] { width: 0; flex: 1; }
+      #hud label { cursor: pointer; margin-right: 8px; white-space: nowrap; }
+      #ar { width: 100%; margin-top: 10px; padding: 8px; font-weight: 700; letter-spacing: 0.1em; cursor: pointer; background: #0b4a5e !important; }
+      #ar:disabled { opacity: 0.5; cursor: default; }
+      #status { margin-top: 8px; color: #8fc; white-space: pre-line; }
+      #help { margin-top: 8px; color: #6a9aaa; font-size: 11px; }
+      #credits { position: fixed; bottom: 6px; right: 10px; color: #4a7080; font-size: 10px; }
+      #hud.hidden { display: none; }
+      #mapbtn { width: 100%; margin-top: 8px; padding: 6px; cursor: pointer; font-weight: 700; letter-spacing: 0.1em; }
+      #map-panel { position: fixed; inset: 4vh 4vw 4vh calc(300px + 40px); display: none; flex-direction: column;
+                   background: rgba(0, 12, 20, 0.92); border: 1px solid #1d5a6e; border-radius: 10px; overflow: hidden; z-index: 1000; }
+      #map-panel.open { display: flex; }
+      #map-bar { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding: 8px 10px; color: #bfefff; font-size: 12px; }
+      #map-bar input, #map-bar button { font: inherit; background: #04202c; color: #dff; border: 1px solid #1d5a6e; border-radius: 4px; padding: 4px 8px; }
+      #map-bar button { cursor: pointer; }
+      #map-bar button:disabled { opacity: 0.4; cursor: default; }
+      #map-search { flex: 1; min-width: 160px; }
+      #map-h { width: 70px; }
+      #map-drop { background: #0b4a5e !important; font-weight: 700; }
+      #map-target { color: #ffd166; flex-basis: 100%; }
+      #map { flex: 1; background: #0a1a22; }
+      @media (max-width: 800px) { #map-panel { inset: 2vh 2vw; } }
+    </style>
+  </head>
+  <body>
+    <div id="hud">
+      <h1>X-RAY VISION</h1>
+      <select id="loc"></select>
+      <div class="row">
+        <input id="lat" type="number" step="0.0001" title="latitude" />
+        <input id="lon" type="number" step="0.0001" title="longitude" />
+        <input id="h" type="number" step="1" title="height above street (m)" />
+        <button id="go">Go</button>
+      </div>
+      <div class="row">
+        <label><input type="checkbox" id="lyr-buildings" checked /> city</label>
+        <label><input type="checkbox" id="lyr-ground" checked /> ground</label>
+        <label><input type="checkbox" id="lyr-planes" checked /> planes</label>
+        <label><input type="checkbox" id="lyr-sats" checked /> sats</label>
+      </div>
+      <div class="row">
+        <label><input type="checkbox" id="lyr-stars" checked /> sky</label>
+        <label><input type="checkbox" id="lyr-const" checked /> constellations</label>
+      </div>
+      <button id="mapbtn">🗺 DROP IN ANYWHERE (M)</button>
+      <button id="ar" disabled>CHECKING AR…</button>
+      <div id="status"></div>
+      <div id="help">
+        Desktop: drag to look · wheel = zoom · Q/E = rotate north · M = map · H = hide panel<br />
+        Headset: right stick ←/→ = rotate world to align north · left stick ↑/↓ = raise/lower yourself
+      </div>
+    </div>
+    <div id="map-panel">
+      <div id="map-bar">
+        <input id="map-search" placeholder="search a place, e.g. Flatiron Building — Enter" />
+        <span>height</span><input id="map-h" type="number" min="0" step="10" /><span>m</span>
+        <span id="map-heights"></span>
+        <button id="map-drop" disabled>DROP IN</button>
+        <button id="map-close">✕</button>
+        <div id="map-target">click the map to choose a spot</div>
+      </div>
+      <div id="map"></div>
+    </div>
+    <div id="credits">Planes: adsb.lol (ODbL) · Buildings: © OpenStreetMap contributors · Orbits: CelesTrak · Stars: d3-celestial / Hipparcos</div>
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "/node_modules/three/build/three.module.js",
+          "astronomy-engine": "/node_modules/astronomy-engine/esm/astronomy.js",
+          "satellite.js": "/node_modules/satellite.js/dist/index.js",
+          "leaflet": "/node_modules/leaflet/dist/leaflet-src.esm.js"
+        }
+      }
+    </script>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
